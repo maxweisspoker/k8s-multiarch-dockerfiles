@@ -1,5 +1,6 @@
 ```
-Built with buildx Docker plugin using QEMU emulation to build natively. (I have found that to be more reliable.)
+Built with buildx Docker plugin using QEMU emulation to build natively. (I have
+found that to be more reliable.)
 
 Build command:
 
