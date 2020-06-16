@@ -1,3 +1,4 @@
+```
 Built with buildx Docker plugin using QEMU emulation to build natively. (I have found that to be more reliable.)
 
 Despite this _more_ reliable success, I have still have issues with compilation. Therefore, I broke apart the Dockerfile in the parent directory into many separate image builds to distinctly save the process into images that I could run and examine. Compilation success varies, and that's a "Heisenbug" I haven't yet figured out. (Even multi-stage builds in the same Dockerfile sometimes have issues.) So instead, I simply save progress and repeat until success. I understand how dumb and hacky this is, but it's a working and reproduceable process, so it's good enough for me for the time being.
@@ -25,4 +26,4 @@ Then finally, the last build:
 $ docker buildx build -f ./Dockerfile_aggregater -t ${DOCKER_TAG_NAME} --platform=linux/arm/v7 --no-cache --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') --load .
 
 (You can now also remove/delete the stage images from your local Docker instance.)
-
+```

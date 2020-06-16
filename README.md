@@ -1,3 +1,4 @@
+```
 This repository contains my own multi-arch build methods for building Kubernetes and the default CNI plugins from source. It was created because I wanted to run K8s on unsupported architectures, as well as have a multi-arch K8s cluster. While my research seems to indicate that everybody knows this is possible, and Docker has been built for almost every architecture, the ease and availability of running K8s across the spectrum it is rather lacking, so I set out to do it myself. In particular, I have like 10 Pi Zeros, and even with full production Docker and Kubelet and Kube-proxy, they still have at least 50-100 megs of RAM free to do... something. Additionally, building K8s through their provided Docker build process produces binaries still dynamically linked to libc. On top of that, the arm versions don't support arm6. So, here we are.
 
 This repo will be updated with more arches and more information as I have time. Right now only the standard arches supported by Kubernetes by default are available -- except my arm version works on both arm6 and arm7, and all my binaries are 100% static and stripped. In the future I plan to add several more arches, including MIPS and RISCV.  (Also, as of right now s390x builds aren't working...)
@@ -11,3 +12,4 @@ This repository is not really supposed to be used by anybody. The nodes and buil
 https://hub.docker.com/r/maxweiss/k8s-multiarch-bins
 
 Those containers can be used either to grab a binary FROM for a multi-stage build, or you can just mount the folders on the host to grab the binaries for your own use. All they do is hold the binaries. They don't run anything.
+```
