@@ -1,0 +1,23 @@
+# Platform:  linux/arm/v6
+
+# golang:alpine  using alpine version 3.12 for arch linux/arm/v7.
+# Yes, you read that right. v7. Go still builds the v6 version.
+FROM docker.io/library/golang@sha256:5dd62f4f9fec2771932446f7ed9dc3a08217d57988876b36bf5af3520a4caae2
+
+ENV K8S_VERSION="1.18.3"
+ENV CNI_PLUGIN_VER_TAG="v0.8.6"
+
+
+# While most builds have better success with Musl, arm7 builds seem to have
+# better success using the gnu libs, therefore no installing Musl
+RUN apk add --update-cache build-base tar bash rsync git conntrack-tools iptables-dev ipset socat \
+    && rm -rf /var/cache/apk/*
+
+RUN mkdir -p /go/src/k8s.io/ && cd /go/src/k8s.io/ \
+    && git clone https://github.com/kubernetes/kubernetes \
+    && cd /go/src/k8s.io/kubernetes \
+    && git checkout "v${K8S_VERSION}"
+
+WORKDIR /go/
+CMD /bin/bash
+

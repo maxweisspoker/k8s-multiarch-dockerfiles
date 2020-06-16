@@ -1,0 +1,19 @@
+# Available from arm32v5/debian as well as library/debian using unsupported platform linux/arm/v5
+FROM docker.io/library/debian@sha256:cdba1475474210418eef21357ffe7d03ab870f8b130cf9a9a523a2e89f7e9561
+
+ARG K8S_VERSION="1.18.3"
+
+RUN apt-get update -y -q && apt-get upgrade -y -q && apt-get install -y -q wget build-essential rsync bash git conntrack socat ipset iptables-dev libc6-dev
+
+RUN mkdir -p /go/src/k8s.io/ && cd /go/src/k8s.io/ \
+    && git clone https://github.com/kubernetes/kubernetes \
+    && cd /go/src/k8s.io/kubernetes \
+    && git checkout "v${K8S_VERSION}"
+
+RUN cd /go/src/k8s.io/kubernetes/build/pause/ \
+    && gcc -Os -Wall -Werror -static -s -g -fPIE -fPIC -o pause pause.c \
+    && chmod 755 /go/src/k8s.io/kubernetes/build/pause/pause
+
+WORKDIR /
+CMD /bin/bash
+

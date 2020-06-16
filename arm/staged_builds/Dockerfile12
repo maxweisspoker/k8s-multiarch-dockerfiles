@@ -1,0 +1,23 @@
+# Platform:  linux/arm/v6
+
+FROM localhost:5000/armstage11
+
+ENV CNI_PLUGIN_VER_TAG="v0.8.6"
+ENV GOOS=linux
+ENV GOARCH=arm
+ENV GOARM=7
+ENV LDFLAGS='-d -s -w -linkmode=external -extldflags="-static" -static -static-libgcc'
+ENV CGO_ENABLED=0
+ENV GOFLAGS=""
+
+RUN mkdir -p /go/src/github.com/containernetworking/ && cd /go/src/github.com/containernetworking/ \
+    && git clone https://github.com/containernetworking/plugins \
+    && cd /go/src/github.com/containernetworking/plugins/ \
+    && git checkout "$CNI_PLUGIN_VER_TAG" \
+    && sed -i 's/\$GO\ build -o \"\${PWD}\/bin\/\$plugin\" \"\$\@\"/\$GO\ build -o \"\$\{PWD\}\/bin\/\$plugin\" \"\$\@\"\ \-ldflags\=\"\-d\ \-s\ \-w\"/' build_linux.sh \
+    && bash ./build_linux.sh \
+    && chmod 755 /go/src/github.com/containernetworking/plugins/bin/*
+
+WORKDIR /go/
+CMD /bin/bash
+

@@ -1,0 +1,53 @@
+# This has produced the best results so far, but I'm still having issues.
+# This image at least provides a fresh starting point to try new ideas.
+
+# debian:buster-slim for platform s390x
+FROM docker.io/library/debian@sha256:415b0f5cc219da59bb200e0680184294e220f6837c9a9ce519be1ab95c696e1a
+
+ARG K8S_VERSION="1.18.3"
+ARG CNI_PLUGIN_VER_TAG="v0.8.6"
+ARG MUSL_VERSION="1.1.24"
+# Need to change label on the bottom image label too
+LABEL org.label-schema.version=$K8S_VERSION
+
+ARG BUILD_DATE="1970-01-01T00:00:00+0000"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.maintainer="TWF4IFdlaXNzIDxtYXhAbWF4d2Vpc3MuaW8+"
+LABEL org.label-schema.name="k8s-multiarch-builder"
+LABEL org.label-schema.description="Kubernetes and CNI Plugin Multi-arch Build"
+LABEL org.label-schema.url="https://github.com/maxweisspoker/k8s-multiarch-dockerfiles"
+
+
+RUN echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
+
+RUN apt-get update -y -q && apt-get upgrade -y -q && apt-get install -y -q wget build-essential rsync bash git conntrack socat ipset iptables-dev libc6-dev \
+    && apt-get -t buster-backports install -y -q "golang-1.13"
+
+ENV GOROOT="/usr/lib/go-1.13/"
+ENV PATH="/usr/lib/go-1.13/bin:${PATH}"
+ENV GOPATH="/go"
+
+# See section 1.4 of https://github.com/linux-on-ibm-z/docs/wiki/Building-Kubernetes
+# for explanation for the _output/ folder touch/chmod stuff
+RUN mkdir -p /go/src/k8s.io/ && cd /go/src/k8s.io/ \
+    && git clone https://github.com/kubernetes/kubernetes \
+    && cd /go/src/k8s.io/kubernetes \
+    && git checkout "v${K8S_VERSION}" \
+    && cd /go/src/k8s.io/kubernetes/vendor/golang.org/x \
+    && mv sys sys.bak \
+    && git clone https://github.com/linux-on-ibm-z/sys.git sys \
+    && cd /go/src/k8s.io/ \
+    && mkdir -p _output/bin \
+    && touch _output/bin/deepcopy-gen \
+    && touch _output/bin/conversion-gen \
+    && touch _output/bin/defaulter-gen \
+    && touch _output/bin/openapi-gen \
+    && chmod u=rwx _output/bin/deepcopy-gen \
+    && chmod u=rwx _output/bin/conversion-gen \
+    && chmod u=rwx _output/bin/defaulter-gen \
+    && chmod u=rwx _output/bin/openapi-gen
+
+WORKDIR /go
+CMD /bin/bash
+

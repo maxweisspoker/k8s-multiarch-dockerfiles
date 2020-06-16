@@ -1,0 +1,50 @@
+# Platform:  linux/arm/v6
+
+# alpine 3.12.0 for linux/arm/v6
+FROM docker.io/library/alpine@sha256:71465c7d45a086a2181ce33bb47f7eaef5c233eace65704da0c5e5454a79cee5
+
+LABEL org.label-schema.version="1.18.3"
+
+ARG BUILD_DATE="1970-01-01T00:00:00+0000"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.maintainer="TWF4IFdlaXNzIDxtYXhAbWF4d2Vpc3MuaW8+"
+LABEL org.label-schema.name="k8s-multiarch-bins"
+LABEL org.label-schema.description="Kubernetes and CNI Plugin Multi-arch Binaries"
+LABEL org.label-schema.url="https://github.com/maxweisspoker/k8s-multiarch-dockerfiles"
+
+RUN mkdir -p /k8s-bins/ && mkdir -p /cni-plugin-bins/
+
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kube-proxy /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kube-apiserver /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kube-controller-manager /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kubelet /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kubeadm /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kubectl /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kube-scheduler /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/cloud-controller-manager /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/kube-aggregator /k8s-bins/
+COPY --from=localhost:5000/armstage12 /go/src/k8s.io/kubernetes/_output/bin/apiextensions-apiserver /k8s-bins/
+COPY --from=localhost:5000/armstage13 /go/src/k8s.io/kubernetes/build/pause/pause /k8s-bins/
+
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/bandwidth /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/firewall /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/flannel /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/portmap /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/sbr /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/tuning /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/bridge /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/host-device /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/ipvlan /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/loopback /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/macvlan /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/ptp /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/vlan /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/dhcp /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/host-local /cni-plugin-bins/
+COPY --from=localhost:5000/armstage12 /go/src/github.com/containernetworking/plugins/bin/static /cni-plugin-bins/
+
+RUN chmod 755 /k8s-bins/* && chmod 755 /cni-plugin-bins/*
+
+WORKDIR /
+CMD /bin/sh
+
