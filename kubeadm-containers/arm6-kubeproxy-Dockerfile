@@ -1,0 +1,20 @@
+FROM docker.io/library/debian@sha256:e59ff2979f0b21b033d474e74de042d6d8f53452143e24a76453787b383106dd
+
+COPY --chown=root:root clean-install /usr/local/bin/clean-install
+
+RUN chmod 755 /usr/local/bin/clean-install; \
+    echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list; \
+    apt-get update; \
+    apt-get -t buster-backports -y --no-install-recommends install iptables
+
+RUN clean-install conntrack ebtables ipset kmod netbase
+
+COPY --chown=root:root iptables-wrapper /usr/sbin/iptables-wrapper
+
+RUN chmod 755 /usr/sbin/iptables-wrapper; \
+    update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-wrapper 100 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-wrapper --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-wrapper; \
+    update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/iptables-wrapper 100 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/iptables-wrapper --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/iptables-wrapper
+
+COPY --chown=root:root kube-proxy /usr/local/bin/kube-proxy
+RUN chmod 755 /usr/local/bin/kube-proxy
+
