@@ -1,14 +1,13 @@
 # Platform:  linux/arm/v6
 
-# golang:alpine  using alpine version 3.12 for arch linux/arm/v7.
-# Yes, you read that right. v7. Go still builds the v6 version.
-FROM docker.io/library/golang@sha256:5dd62f4f9fec2771932446f7ed9dc3a08217d57988876b36bf5af3520a4caae2
+# golang:alpine  using alpine version 3.12 for arch linux/arm/v6.
+FROM docker.io/library/golang@sha256:c31f7b83158d71f52bcefdb6035e4fbbb73b4583f32e073e9224a43c87dc6ea9
 
-ENV K8S_VERSION="1.18.3"
+ENV K8S_VERSION="1.18.6"
 ENV CNI_PLUGIN_VER_TAG="v0.8.6"
 
 
-# While most builds have better success with Musl, arm7 builds seem to have
+# While most builds have better success with Musl, arm builds seem to have
 # better success using the gnu libs, therefore no installing Musl
 RUN apk add --update-cache build-base tar bash rsync git conntrack-tools iptables-dev ipset socat \
     && rm -rf /var/cache/apk/*

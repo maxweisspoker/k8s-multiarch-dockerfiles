@@ -2,11 +2,9 @@
 
 FROM localhost:5000/armstage04
 
-# Even though GOARM is set to 7, it will still build armel soft float.
-# I don't know why. But I found variables that work, and I'm keeping them.
 ENV GOOS=linux
 ENV GOARCH=arm
-ENV GOARM=7
+ENV GOARM=6
 ENV LDFLAGS='-d -s -w -linkmode=external -extldflags="-static" -static -static-libgcc'
 ENV CGO_ENABLED=0
 ENV GOFLAGS=""

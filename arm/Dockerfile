@@ -1,11 +1,10 @@
 # Platform:  linux/arm/v6
 
 
-# golang:alpine  using alpine version 3.12 for arch linux/arm/v7
-# Yes, you read that right. v7. Go still builds the v6 version.
-FROM docker.io/library/golang@sha256:5dd62f4f9fec2771932446f7ed9dc3a08217d57988876b36bf5af3520a4caae2
+# golang:alpine  using alpine version 3.12 for arch linux/arm/v6
+FROM docker.io/library/golang@sha256:c31f7b83158d71f52bcefdb6035e4fbbb73b4583f32e073e9224a43c87dc6ea9
 
-ARG K8S_VERSION="1.18.3"
+ARG K8S_VERSION="1.18.6"
 ARG CNI_PLUGIN_VER_TAG="v0.8.6"
 
 # Need to change label on the bottom image label too
@@ -29,11 +28,9 @@ RUN mkdir -p /go/src/k8s.io/ && cd /go/src/k8s.io/ \
     && cd /go/src/k8s.io/kubernetes \
     && git checkout "v${K8S_VERSION}"
 
-# Even though GOARM is set to 7, it will still build armel soft float.
-# I don't know why. But I found variables that work, and I'm keeping them.
 ENV GOOS=linux
 ENV GOARCH=arm
-ENV GOARM=7
+ENV GOARM=6
 ENV LDFLAGS='-d -s -w -linkmode=external -extldflags="-static" -static -static-libgcc'
 ENV CGO_ENABLED=0
 ENV GOFLAGS=""
@@ -72,7 +69,7 @@ CMD /bin/bash
 # alpine 3.12.0 for linux/arm/v6
 FROM docker.io/library/alpine@sha256:71465c7d45a086a2181ce33bb47f7eaef5c233eace65704da0c5e5454a79cee5
 
-ARG K8S_VERSION="1.18.3"
+ARG K8S_VERSION="1.18.6"
 LABEL org.label-schema.version=$K8S_VERSION
 
 ARG BUILD_DATE="1970-01-01T00:00:00+0000"
